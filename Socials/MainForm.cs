@@ -4,6 +4,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Mail;
 using System.Windows.Forms;
 using System.Configuration;
@@ -30,12 +31,7 @@ namespace Socials
   /// </summary>
   public partial class MainForm : Form
   {
-    WebView bwWhatsapp;
-    WebView bwFacebook;
-    WebView bwTwitter;
-    
-    WebControl wc;
-        
+           
     TrayIcon _t;
     
     Configuracion config;
@@ -60,7 +56,7 @@ namespace Socials
       _t = new TrayIcon(this);
       
       var wc = new WebControl { Dock = DockStyle.Fill, };
-      wc.WebView = new WebView{ Url = "m.facebook.com" };
+      wc.WebView = new WebView{ Url = "m.facebook.com",  };
       var tp = new TabPage("Facebook");
       tp.Controls.Add(wc);
       
@@ -81,12 +77,32 @@ namespace Socials
       wc2.WebView.NewWindow += onNewWindow;
       wc3.WebView.NewWindow += onNewWindow;
       
+      wc.WebView.StatusMessageChanged += onStatusMessageChanged;
+      wc2.WebView.StatusMessageChanged += onStatusMessageChanged;
+      wc3.WebView.StatusMessageChanged += onStatusMessageChanged;
+      
+      wc.WebView.TitleChanged += onTitleChanged;
       
     }
 
+    void onTitleChanged(object sender, EventArgs e)
+    {
+      Text = ((WebView)sender).Title;
+    }
+    
+    void onStatusMessageChanged(object sender, EventArgs e)
+    {
+      Text = ((WebView)sender).StatusMessage;
+    }
+    
     void onNewWindow(object sender, NewWindowEventArgs e)
     {
-      e.Accepted = true;
+//      e.Accepted = true;
+//      Process.Start(e.TargetUrl);
+
+      webBrowser1.Navigate(new Uri(e.TargetUrl));
+      webBrowser1.Visible = true;
+      richTextBox1.Visible = false;
     }
     
     void MainForm_Load(object sender, EventArgs e)
@@ -97,8 +113,6 @@ namespace Socials
       if (!string.IsNullOrEmpty(config.correo) && !string.IsNullOrEmpty(config.imap)) {
         CargarTodos();
       }
-
-
     }
     
     private void CargarNoLeidos()
@@ -114,9 +128,7 @@ namespace Socials
         dataGridView1.Sort(dataGridView1.Columns[2], System.ComponentModel.ListSortDirection.Descending);
       }
       
-      if (imap.Supports("IDLE")) {
-        imap.NewMessage += OnNewMessage;
-      }
+
     }
     
     private void CargarTodos()
@@ -138,6 +150,10 @@ namespace Socials
         } else {
           break;
         }
+      }
+      
+      if (imap.Supports("IDLE")) {
+        imap.NewMessage += OnNewMessage;
       }
       
     }
