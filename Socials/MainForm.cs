@@ -45,8 +45,8 @@ namespace Socials
 
       InitializeComponent();
       
-      BrowserOptions bo = new BrowserOptions();
-      bo.UserStyleSheet = @"#side.pane-list{width: 90px !important;}";
+      var bo = new BrowserOptions();
+      bo.UserStyleSheet = @"#side.pane-list{width: 80px;}";
       Runtime.SetDefaultOptions(bo);
       
       //Cargar Configuracion 
@@ -59,36 +59,44 @@ namespace Socials
       
       _t = new TrayIcon(this);
       
-      var wc = new WebControl() { Dock = DockStyle.Fill, };
-      wc.WebView = new WebView(){ Url = "m.facebook.com" };
+      var wc = new WebControl { Dock = DockStyle.Fill, };
+      wc.WebView = new WebView{ Url = "m.facebook.com" };
       var tp = new TabPage("Facebook");
       tp.Controls.Add(wc);
-      tabControl1.TabPages.Add(tp);
       
-      var wc2 = new WebControl() { Dock = DockStyle.Fill, };
-      wc2.WebView = new WebView(){ Url = "mobile.twitter.com" };
+      tabControl1.TabPages.Add(tp);
+      var wc2 = new WebControl { Dock = DockStyle.Fill, };
+      wc2.WebView = new WebView{ Url = "mobile.twitter.com" };
       var tp2 = new TabPage("Twitter");
       tp2.Controls.Add(wc2);
       tabControl1.TabPages.Add(tp2);
       
-      var wc3 = new WebControl() { Dock = DockStyle.Fill, };
-      wc3.WebView = new WebView(){ Url = "web.whatsapp.com" };
+      var wc3 = new WebControl { Dock = DockStyle.Fill, };
+      wc3.WebView = new WebView{ Url = "web.whatsapp.com" };
       var tp3 = new TabPage("Whatsapp");
       tp3.Controls.Add(wc3);
       tabControl1.TabPages.Add(tp3);
       
+      wc.WebView.NewWindow += onNewWindow;
+      wc2.WebView.NewWindow += onNewWindow;
+      wc3.WebView.NewWindow += onNewWindow;
+      
       
     }
 
+    void onNewWindow(object sender, NewWindowEventArgs e)
+    {
+      e.Accepted = true;
+    }
     
     void MainForm_Load(object sender, EventArgs e)
     {
       Visible = true;
       Application.DoEvents();
       
-      CargarNoLeidos();
-
-      CargarTodos();
+      if (!string.IsNullOrEmpty(config.correo) && !string.IsNullOrEmpty(config.imap)) {
+        CargarTodos();
+      }
 
 
     }
@@ -101,8 +109,9 @@ namespace Socials
       IEnumerable<MailMessage> mensajes = imap.GetMessages(uids);
       foreach (var m in mensajes) {
         DateTime d = Convert.ToDateTime(m.Headers.Get("Date"));
-        int indice = dataGridView1.Rows.Add(m.From, m.Subject,d );
+        int indice = dataGridView1.Rows.Add(m.From, m.Subject, d);
         dataGridView1.Rows[indice].Tag = m;
+        dataGridView1.Sort(dataGridView1.Columns[2], System.ComponentModel.ListSortDirection.Descending);
       }
       
       if (imap.Supports("IDLE")) {
@@ -125,6 +134,7 @@ namespace Socials
           DateTime d = Convert.ToDateTime(m.Headers.Get("Date"));
           int indice = dataGridView1.Rows.Add(m.From, m.Subject, d);
           dataGridView1.Rows[indice].Tag = m;
+          dataGridView1.Sort(dataGridView1.Columns[2], System.ComponentModel.ListSortDirection.Descending);
         } else {
           break;
         }
@@ -135,10 +145,11 @@ namespace Socials
     private void OnNewMessage(object sender, IdleMessageEventArgs e)
     {
       
-      MailMessage m = e.Client.GetMessage(e.MessageUID);
-      DateTime d = Convert.ToDateTime(m.Headers.Get("Date"));
-      int indice = dataGridView1.Rows.Add(m.From, m.Subject, d);
+      var m = e.Client.GetMessage(e.MessageUID);
+      var d = Convert.ToDateTime(m.Headers.Get("Date"));
+      var indice = dataGridView1.Rows.Add(m.From, m.Subject, d);
       dataGridView1.Rows[indice].Tag = m;
+      dataGridView1.Sort(dataGridView1.Columns[2], System.ComponentModel.ListSortDirection.Descending);
       dataGridView1.Refresh();
     }
 

@@ -47,11 +47,12 @@ namespace Socials
 
     void onAbrir(object sender, EventArgs e)
     {
+      
+//      if (_ventana.WindowState == FormWindowState.Minimized) {
+//        _ventana.WindowState = FormWindowState.Normal;
+//      }
       _ventana.ShowInTaskbar = true;
       _ventana.Show();
-      if (_ventana.WindowState == FormWindowState.Minimized) {
-        _ventana.WindowState = FormWindowState.Normal;
-      }
     }
     void onSalir(object sender, EventArgs e)
     {
@@ -62,6 +63,7 @@ namespace Socials
     void onSizeChanged(object sender, EventArgs e)
     {
       if (_ventana.WindowState == FormWindowState.Minimized) {
+        _ventana.WindowState = FormWindowState.Normal;
         _ventana.ShowInTaskbar = false;
         _ventana.Hide();
       }
