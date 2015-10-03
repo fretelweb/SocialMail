@@ -4,86 +4,82 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net.Mail;
 using System.Windows.Forms;
+using System.Configuration;
+
+using EO.WebBrowser;
+using EO.WebBrowser.WinForm;
 using S22.Imap;
-using CefSharp;
 using System.Linq;
-using CefSharp.WinForms;
 
 namespace Socials
 {
+  
+  struct Configuracion
+  {
+    public string correo;
+    public string pwd;
+    public string imap;
+    public int puerto;
+  }
+  
   
   /// <summary>
   /// Description of MainForm.
   /// </summary>
   public partial class MainForm : Form
   {
-    ChromiumWebBrowser bwWhatsapp;
-    ChromiumWebBrowser bwFacebook;
-    ChromiumWebBrowser bwTwitter;
+    WebView bwWhatsapp;
+    WebView bwFacebook;
+    WebView bwTwitter;
     
+    WebControl wc;
+        
     TrayIcon _t;
     
+    Configuracion config;
     
     public MainForm()
     {
 
       InitializeComponent();
       
+      BrowserOptions bo = new BrowserOptions();
+      bo.UserStyleSheet = @"#side.pane-list{width: 90px !important;}";
+      Runtime.SetDefaultOptions(bo);
+      
+      //Cargar Configuracion 
+      config = new Configuracion() {
+        correo = ConfigurationSettings.AppSettings["correo"],
+        pwd = ConfigurationSettings.AppSettings["pwd"],
+        imap = ConfigurationSettings.AppSettings["imap"],
+        puerto = Convert.ToInt32(ConfigurationSettings.AppSettings["puerto"]),
+      };
+      
       _t = new TrayIcon(this);
       
-      var settings = new CefSettings();
-      settings.CachePath = Environment.SpecialFolder.UserProfile.ToString();
-      settings.PersistSessionCookies = true;
-      Cef.Initialize(settings);
-      
-      
-      bwFacebook = new ChromiumWebBrowser("m.facebook.com") { Dock = DockStyle.Fill };
-      var tp = new TabPage("Facebook"){ Dock = DockStyle.Fill, };
+      var wc = new WebControl() { Dock = DockStyle.Fill, };
+      wc.WebView = new WebView(){ Url = "m.facebook.com" };
+      var tp = new TabPage("Facebook");
+      tp.Controls.Add(wc);
       tabControl1.TabPages.Add(tp);
-      tp.Controls.Add(bwFacebook);
       
-      bwWhatsapp = new ChromiumWebBrowser("web.whatsapp.com") { Dock = DockStyle.Fill };
-      var tp2 = new TabPage("Whatsapp"){ Dock = DockStyle.Fill, };
+      var wc2 = new WebControl() { Dock = DockStyle.Fill, };
+      wc2.WebView = new WebView(){ Url = "mobile.twitter.com" };
+      var tp2 = new TabPage("Twitter");
+      tp2.Controls.Add(wc2);
       tabControl1.TabPages.Add(tp2);
-      tp2.Controls.Add(bwWhatsapp);
       
-      bwTwitter = new ChromiumWebBrowser("mobile.twitter.com") { Dock = DockStyle.Fill };
-      var tp3 = new TabPage("Twitter"){ Dock = DockStyle.Fill, };
+      var wc3 = new WebControl() { Dock = DockStyle.Fill, };
+      wc3.WebView = new WebView(){ Url = "web.whatsapp.com" };
+      var tp3 = new TabPage("Whatsapp");
+      tp3.Controls.Add(wc3);
       tabControl1.TabPages.Add(tp3);
-      tp3.Controls.Add(bwTwitter);
       
-      bwFacebook.LoadingStateChanged += bw_LoadingStateChanged;
-      bwTwitter.LoadingStateChanged += bw_LoadingStateChanged;
-      bwWhatsapp.LoadingStateChanged += bw_LoadingStateChanged;
       
-      bwWhatsapp.ConsoleMessage += bw_ConsoleMessage;
-      bwFacebook.ConsoleMessage += bw_ConsoleMessage;
-      bwTwitter.ConsoleMessage += bw_ConsoleMessage;
-      
-      bwWhatsapp.TitleChanged += bw_TitleChanged;
-      bwFacebook.TitleChanged += bw_TitleChanged;
-      bwTwitter.TitleChanged += bw_TitleChanged;
     }
 
-    void bw_TitleChanged(object sender, TitleChangedEventArgs e)
-    {
-      Debug.WriteLine("Enviado de : " + ((ChromiumWebBrowser)sender).Name);
-      Debug.WriteLine("Titulo cambio a: " + e.Title);
-    }
-    
-    void bw_ConsoleMessage(object sender, ConsoleMessageEventArgs e)
-    {
-      Debug.WriteLine("Enviado de : " + ((ChromiumWebBrowser)sender).Name);
-      Debug.WriteLine("Console mensaje: " + e.Message);
-    }
-    
-    void bw_LoadingStateChanged(object sender, LoadingStateChangedEventArgs e)
-    {
-      
-    }
     
     void MainForm_Load(object sender, EventArgs e)
     {
@@ -91,20 +87,21 @@ namespace Socials
       Application.DoEvents();
       
       CargarNoLeidos();
-      
-      if (dataGridView1.Rows.Count == 0) {
-        CargarTodos();
-      }
+
+      CargarTodos();
+
 
     }
     
     private void CargarNoLeidos()
     {
-      var imap = new ImapClient("imap.gmail.com", 993, "", "", AuthMethod.Auto, true);
+      var imap = new ImapClient(
+                   config.imap, config.puerto, config.correo, config.pwd, AuthMethod.Auto, true);
       IEnumerable<uint> uids = imap.Search(SearchCondition.Unseen());
       IEnumerable<MailMessage> mensajes = imap.GetMessages(uids);
       foreach (var m in mensajes) {
-        int indice = dataGridView1.Rows.Add(m.From, m.Subject, m.Headers.Get("Date"));
+        DateTime d = Convert.ToDateTime(m.Headers.Get("Date"));
+        int indice = dataGridView1.Rows.Add(m.From, m.Subject,d );
         dataGridView1.Rows[indice].Tag = m;
       }
       
@@ -115,14 +112,18 @@ namespace Socials
     
     private void CargarTodos()
     {
-      var imap = new ImapClient("imap.gmail.com", 993, "", "", AuthMethod.Auto, true);
-      IEnumerable<uint> uids = imap.Search(SearchCondition.All(), "inbox");
+      var imap = new ImapClient(
+                   config.imap, config.puerto, config.correo, config.pwd, AuthMethod.Auto, true);
+      IEnumerable<uint> uids = imap.Search(
+                                 SearchCondition.SentSince(DateTime.Now.AddDays(-7)), "inbox"
+                               );
       foreach (uint uid in uids) {
         Application.DoEvents();
         Text = uid + "" + uids.Count();
         if (!dataGridView1.IsDisposed) {
           MailMessage m = imap.GetMessage(uid);
-          int indice = dataGridView1.Rows.Add(m.From, m.Subject,m.Headers.Get("Date"));
+          DateTime d = Convert.ToDateTime(m.Headers.Get("Date"));
+          int indice = dataGridView1.Rows.Add(m.From, m.Subject, d);
           dataGridView1.Rows[indice].Tag = m;
         } else {
           break;
@@ -135,7 +136,8 @@ namespace Socials
     {
       
       MailMessage m = e.Client.GetMessage(e.MessageUID);
-      int indice = dataGridView1.Rows.Add(m.From, m.Subject, m.Headers.Get("Date"));
+      DateTime d = Convert.ToDateTime(m.Headers.Get("Date"));
+      int indice = dataGridView1.Rows.Add(m.From, m.Subject, d);
       dataGridView1.Rows[indice].Tag = m;
       dataGridView1.Refresh();
     }

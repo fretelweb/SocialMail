@@ -67,7 +67,7 @@ namespace Socials
       this.tabControl1.Location = new System.Drawing.Point(0, 0);
       this.tabControl1.Name = "tabControl1";
       this.tabControl1.SelectedIndex = 0;
-      this.tabControl1.Size = new System.Drawing.Size(228, 393);
+      this.tabControl1.Size = new System.Drawing.Size(238, 393);
       this.tabControl1.TabIndex = 0;
       // 
       // webBrowser1
@@ -76,7 +76,7 @@ namespace Socials
       this.webBrowser1.Location = new System.Drawing.Point(0, 0);
       this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
       this.webBrowser1.Name = "webBrowser1";
-      this.webBrowser1.Size = new System.Drawing.Size(446, 248);
+      this.webBrowser1.Size = new System.Drawing.Size(465, 248);
       this.webBrowser1.TabIndex = 2;
       // 
       // dataGridView1
@@ -96,7 +96,7 @@ namespace Socials
       this.dataGridView1.Name = "dataGridView1";
       this.dataGridView1.RowHeadersVisible = false;
       this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-      this.dataGridView1.Size = new System.Drawing.Size(446, 141);
+      this.dataGridView1.Size = new System.Drawing.Size(465, 141);
       this.dataGridView1.TabIndex = 1;
       this.dataGridView1.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_RowEnter);
       // 
@@ -128,8 +128,8 @@ namespace Socials
       // splitContainer1.Panel2
       // 
       this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
-      this.splitContainer1.Size = new System.Drawing.Size(678, 393);
-      this.splitContainer1.SplitterDistance = 446;
+      this.splitContainer1.Size = new System.Drawing.Size(707, 393);
+      this.splitContainer1.SplitterDistance = 465;
       this.splitContainer1.TabIndex = 2;
       // 
       // splitContainer2
@@ -147,7 +147,7 @@ namespace Socials
       // 
       this.splitContainer2.Panel2.Controls.Add(this.richTextBox1);
       this.splitContainer2.Panel2.Controls.Add(this.webBrowser1);
-      this.splitContainer2.Size = new System.Drawing.Size(446, 393);
+      this.splitContainer2.Size = new System.Drawing.Size(465, 393);
       this.splitContainer2.SplitterDistance = 141;
       this.splitContainer2.TabIndex = 2;
       // 
@@ -156,7 +156,7 @@ namespace Socials
       this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
       this.richTextBox1.Location = new System.Drawing.Point(0, 0);
       this.richTextBox1.Name = "richTextBox1";
-      this.richTextBox1.Size = new System.Drawing.Size(446, 248);
+      this.richTextBox1.Size = new System.Drawing.Size(465, 248);
       this.richTextBox1.TabIndex = 3;
       this.richTextBox1.Text = "";
       // 
@@ -164,7 +164,7 @@ namespace Socials
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(678, 393);
+      this.ClientSize = new System.Drawing.Size(707, 393);
       this.Controls.Add(this.splitContainer1);
       this.Name = "MainForm";
       this.Text = "Socials";

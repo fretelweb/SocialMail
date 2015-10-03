@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <appSettings>
+    <add key="correo" value="" />
+    <add key="pwd" value="" />
+    <add key="imap" value="imap.gmail.com" />
+    <add key="puerto" value="993" />
+  </appSettings>
+  <startup>
+    <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.0" />
+  </startup>
+</configuration>

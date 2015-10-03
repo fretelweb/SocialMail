@@ -1,7 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
-  <Import Project="..\packages\CefSharp.WinForms.43.0.0\build\CefSharp.WinForms.props" Condition="Exists('..\packages\CefSharp.WinForms.43.0.0\build\CefSharp.WinForms.props')" />
-  <Import Project="..\packages\CefSharp.Common.43.0.0\build\CefSharp.Common.props" Condition="Exists('..\packages\CefSharp.Common.43.0.0\build\CefSharp.Common.props')" />
   <PropertyGroup>
     <ProjectGuid>{D29C4409-6DAD-468D-9C72-09239150EDC9}</ProjectGuid>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -47,6 +45,15 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EO.Base">
+      <HintPath>..\packages\EO.WebBrowser.15.2.65.0\lib\EO.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="EO.WebBrowser">
+      <HintPath>..\packages\EO.WebBrowser.15.2.65.0\lib\EO.WebBrowser.dll</HintPath>
+    </Reference>
+    <Reference Include="EO.WebEngine">
+      <HintPath>..\packages\EO.WebBrowser.15.2.65.0\lib\EO.WebEngine.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -70,6 +77,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Form1.cs" />
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs" />
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -79,19 +90,23 @@
     <Compile Include="TrayIcon.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.gitignore">
+      <Link>.gitignore</Link>
+    </None>
     <None Include="..\README.md">
       <Link>README.md</Link>
     </None>
     <None Include="app.config" />
+    <None Include="app.config.bk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\cef.redist.x86.3.2357.1287\build\cef.redist.x86.targets" Condition="Exists('..\packages\cef.redist.x86.3.2357.1287\build\cef.redist.x86.targets')" />
-  <Import Project="..\packages\cef.redist.x64.3.2357.1287\build\cef.redist.x64.targets" Condition="Exists('..\packages\cef.redist.x64.3.2357.1287\build\cef.redist.x64.targets')" />
-  <Import Project="..\packages\CefSharp.Common.43.0.0\build\CefSharp.Common.targets" Condition="Exists('..\packages\CefSharp.Common.43.0.0\build\CefSharp.Common.targets')" />
 </Project>
