@@ -142,7 +142,7 @@ namespace Socials
         Application.DoEvents();
         Text = uid + "" + uids.Count();
         if (!dataGridView1.IsDisposed) {
-          MailMessage m = imap.GetMessage(uid);
+          MailMessage m = imap.GetMessage(uid,false);
           DateTime d = Convert.ToDateTime(m.Headers.Get("Date"));
           int indice = dataGridView1.Rows.Add(m.From, m.Subject, d);
           dataGridView1.Rows[indice].Tag = m;
@@ -161,7 +161,7 @@ namespace Socials
     private void OnNewMessage(object sender, IdleMessageEventArgs e)
     {
       
-      var m = e.Client.GetMessage(e.MessageUID);
+      var m = e.Client.GetMessage(e.MessageUID,false);
       var d = Convert.ToDateTime(m.Headers.Get("Date"));
       var indice = dataGridView1.Rows.Add(m.From, m.Subject, d);
       dataGridView1.Rows[indice].Tag = m;
@@ -175,6 +175,8 @@ namespace Socials
     {
       if (dataGridView1.Rows[e.RowIndex].Tag != null) {
         var mail = dataGridView1.Rows[e.RowIndex].Tag as MailMessage;
+        webBrowser1.Visible = mail.IsBodyHtml;
+        richTextBox1.Visible = !mail.IsBodyHtml;
         if (mail.IsBodyHtml) {
           webBrowser1.DocumentText = mail.Body;
         } else {
